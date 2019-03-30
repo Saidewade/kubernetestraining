@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-config
+spec:
+  containers:
+  - name: test-container
+    image: gcr.io/kuar-demo/kuard-amd64:1
+    imagePullPolicy: Always
+    command:
+      - "/kuard"
+      - "$(EXTRA_PARAM)"
+    env:
+      - name: ANOTHER_PARAM
+        valueFrom:
+          configMapKeyRef:
+            name: my-config
+            key: another-param
+# Define the environment variable
+      - name: EXTRA_PARAM
+        valueFrom:
+          configMapKeyRef:
+# The ConfigMap containing the value you want to assign to ANOTHER_PARAM
+            name: my-config
+# Specify the key associated with the value
+            key: extra-param
+    volumeMounts:
+      - name: config-volume
+        mountPath: /config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: my-config
+  restartPolicy: Never
